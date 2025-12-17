@@ -1,0 +1,60 @@
+---
+- name: Configure web servers
+  hosts: webservers
+  become: true
+  vars:
+    app_name: myapp
+    app_user: www-data
+    app_port: 3000
+    node_version: "20"
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - role: common
+    - role: nodejs
+    - role: nginx
+    - role: app
+
+  handlers:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Restart app
+      systemd:
+        name: "{{ app_name }}"
+        state: restarted
+        daemon_reload: yes
+
+  tasks:
+    - name: Ensure app directory exists
+      file:
+        path: "/var/www/{{ app_name }}"
+        state: directory
+        owner: "{{ app_user }}"
+        mode: '0755'
+
+    - name: Deploy application
+      copy:
+        src: dist/
+        dest: "/var/www/{{ app_name }}/"
+        owner: "{{ app_user }}"
+      notify: Restart app
+
+    - name: Create systemd service
+      template:
+        src: templates/app.service.j2
+        dest: "/etc/systemd/system/{{ app_name }}.service"
+      notify: Restart app
+
+    - name: Ensure app is running
+      systemd:
+        name: "{{ app_name }}"
+        state: started
+        enabled: yes

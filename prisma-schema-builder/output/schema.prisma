@@ -1,0 +1,293 @@
+// ===========================================
+// Prisma Schema: Blog Platform
+// ===========================================
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+// ===========================================
+// Enums
+// ===========================================
+
+enum UserRole {
+  USER
+  AUTHOR
+  EDITOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+}
+
+// ===========================================
+// User Model
+// ===========================================
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified DateTime?  @map("email_verified")
+  passwordHash  String?    @map("password_hash")
+
+  // Profile
+  username      String     @unique
+  firstName     String?    @map("first_name")
+  lastName      String?    @map("last_name")
+  displayName   String?    @map("display_name")
+  avatarUrl     String?    @map("avatar_url")
+  bio           String?    @db.Text
+  website       String?
+
+  // Account status
+  role          UserRole   @default(USER)
+  status        UserStatus @default(PENDING_VERIFICATION)
+
+  // Timestamps
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  lastLoginAt   DateTime?  @map("last_login_at")
+
+  // Relations
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  bookmarks     Bookmark[]
+  followers     Follow[]   @relation("Following")
+  following     Follow[]   @relation("Followers")
+  sessions      Session[]
+
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+// ===========================================
+// Session Model
+// ===========================================
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  expiresAt    DateTime @map("expires_at")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ===========================================
+// Post Model
+// ===========================================
+
+model Post {
+  id            String     @id @default(cuid())
+  authorId      String     @map("author_id")
+
+  // Content
+  title         String     @db.VarChar(255)
+  slug          String     @unique
+  excerpt       String?    @db.VarChar(500)
+  content       String     @db.Text
+  featuredImage String?    @map("featured_image")
+
+  // Status
+  status        PostStatus @default(DRAFT)
+  publishedAt   DateTime?  @map("published_at")
+  scheduledAt   DateTime?  @map("scheduled_at")
+
+  // SEO
+  metaTitle       String?  @map("meta_title") @db.VarChar(60)
+  metaDescription String?  @map("meta_description") @db.VarChar(160)
+
+  // Metrics
+  viewCount     Int        @default(0) @map("view_count")
+  readingTime   Int?       @map("reading_time")
+
+  // Timestamps
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  author        User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categories    PostCategory[]
+  tags          PostTag[]
+  comments      Comment[]
+  likes         Like[]
+  bookmarks     Bookmark[]
+
+  @@index([authorId])
+  @@index([slug])
+  @@index([status, publishedAt])
+  @@map("posts")
+}
+
+// ===========================================
+// Category Model
+// ===========================================
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  imageUrl    String?    @map("image_url")
+  parentId    String?    @map("parent_id")
+  sortOrder   Int        @default(0) @map("sort_order")
+
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // Self-relation for hierarchy
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+
+  // Relations
+  posts       PostCategory[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@map("categories")
+}
+
+// ===========================================
+// Tag Model
+// ===========================================
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  posts     PostTag[]
+
+  @@index([slug])
+  @@map("tags")
+}
+
+// ===========================================
+// Junction Tables
+// ===========================================
+
+model PostCategory {
+  postId     String   @map("post_id")
+  categoryId String   @map("category_id")
+
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+  @@map("post_categories")
+}
+
+model PostTag {
+  postId String @map("post_id")
+  tagId  String @map("tag_id")
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+// ===========================================
+// Comment Model
+// ===========================================
+
+model Comment {
+  id        String    @id @default(cuid())
+  postId    String    @map("post_id")
+  authorId  String    @map("author_id")
+  parentId  String?   @map("parent_id")
+
+  content   String    @db.Text
+  isEdited  Boolean   @default(false) @map("is_edited")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+// ===========================================
+// Like & Bookmark Models
+// ===========================================
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("likes")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("bookmarks")
+}
+
+// ===========================================
+// Follow Model
+// ===========================================
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower    User     @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}

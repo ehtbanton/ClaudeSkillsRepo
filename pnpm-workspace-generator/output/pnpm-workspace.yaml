@@ -1,0 +1,16 @@
+packages:
+  # Apps
+  - 'apps/*'
+
+  # Shared packages
+  - 'packages/*'
+
+  # Internal tooling
+  - 'tools/*'
+
+  # Documentation
+  - 'docs'
+
+  # Exclude test fixtures
+  - '!**/test/**'
+  - '!**/__tests__/**'

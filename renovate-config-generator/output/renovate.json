@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":automergeMinor",
+    "group:monorepos",
+    "group:recommended"
+  ],
+  "timezone": "America/New_York",
+  "schedule": ["before 6am on Monday"],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "labels": ["dependencies"],
+  "assignees": ["@your-username"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "groupName": "ESLint",
+      "matchPackagePatterns": ["^eslint", "^@typescript-eslint"]
+    },
+    {
+      "groupName": "Testing",
+      "matchPackagePatterns": ["jest", "vitest", "@testing-library"]
+    },
+    {
+      "matchPackagePatterns": ["typescript"],
+      "extends": ["schedule:monthly"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "automerge": true
+  }
+}

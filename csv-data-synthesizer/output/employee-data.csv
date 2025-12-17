@@ -1,0 +1,21 @@
+employee_id,first_name,last_name,email,department,job_title,hire_date,salary,manager_id,status
+EMP001,John,Smith,john.smith@company.com,Engineering,Senior Software Engineer,2020-03-15,125000,EMP010,active
+EMP002,Sarah,Johnson,sarah.johnson@company.com,Marketing,Marketing Manager,2019-07-22,95000,EMP011,active
+EMP003,Michael,Williams,michael.williams@company.com,Engineering,DevOps Engineer,2021-01-10,115000,EMP010,active
+EMP004,Emily,Brown,emily.brown@company.com,Human Resources,HR Specialist,2020-09-05,72000,EMP012,active
+EMP005,David,Davis,david.davis@company.com,Sales,Account Executive,2022-02-14,85000,EMP013,active
+EMP006,Jennifer,Miller,jennifer.miller@company.com,Engineering,Frontend Developer,2021-06-28,98000,EMP010,active
+EMP007,Robert,Wilson,robert.wilson@company.com,Finance,Financial Analyst,2019-11-30,88000,EMP014,active
+EMP008,Lisa,Anderson,lisa.anderson@company.com,Engineering,QA Engineer,2020-04-20,82000,EMP010,active
+EMP009,James,Taylor,james.taylor@company.com,Product,Product Manager,2018-08-12,120000,EMP015,active
+EMP010,Patricia,Thomas,patricia.thomas@company.com,Engineering,Engineering Manager,2017-05-03,145000,EMP016,active
+EMP011,Daniel,Jackson,daniel.jackson@company.com,Marketing,VP of Marketing,2016-02-18,175000,EMP017,active
+EMP012,Nancy,White,nancy.white@company.com,Human Resources,HR Director,2015-09-25,130000,EMP017,active
+EMP013,Christopher,Harris,christopher.harris@company.com,Sales,Sales Director,2016-11-08,160000,EMP017,active
+EMP014,Karen,Martin,karen.martin@company.com,Finance,CFO,2014-04-15,220000,EMP018,active
+EMP015,Steven,Garcia,steven.garcia@company.com,Product,VP of Product,2015-07-20,185000,EMP017,active
+EMP016,Betty,Martinez,betty.martinez@company.com,Engineering,CTO,2013-01-12,250000,EMP018,active
+EMP017,Mark,Robinson,mark.robinson@company.com,Operations,COO,2012-06-30,280000,EMP018,active
+EMP018,Sandra,Clark,sandra.clark@company.com,Executive,CEO,2010-03-01,350000,,active
+EMP019,Kevin,Rodriguez,kevin.rodriguez@company.com,Engineering,Backend Developer,2023-04-17,95000,EMP010,active
+EMP020,Michelle,Lewis,michelle.lewis@company.com,Customer Support,Support Lead,2021-10-25,68000,EMP017,active

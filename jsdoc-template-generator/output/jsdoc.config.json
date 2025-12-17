@@ -1,0 +1,42 @@
+{
+  "source": {
+    "include": ["src"],
+    "includePattern": ".+\\.ts$",
+    "excludePattern": "(node_modules|test|spec)"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "node_modules/better-docs/typescript"
+  ],
+  "opts": {
+    "destination": "./docs",
+    "recurse": true,
+    "readme": "README.md",
+    "template": "node_modules/better-docs"
+  },
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "search": true,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": false
+    },
+    "better-docs": {
+      "name": "My Library",
+      "title": "API Documentation",
+      "css": "style.css",
+      "hideGenerator": false,
+      "navLinks": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/org/repo"
+        }
+      ]
+    }
+  }
+}

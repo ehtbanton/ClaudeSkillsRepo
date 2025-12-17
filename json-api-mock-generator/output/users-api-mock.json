@@ -1,0 +1,103 @@
+{
+  "status": "success",
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "uuid": "550e8400-e29b-41d4-a716-446655440001",
+        "username": "johndoe",
+        "email": "john.doe@example.com",
+        "profile": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe",
+          "bio": "Senior software engineer with 10 years of experience",
+          "location": "San Francisco, CA"
+        },
+        "role": "admin",
+        "status": "active",
+        "createdAt": "2024-01-15T08:30:00Z",
+        "updatedAt": "2024-12-10T14:22:33Z"
+      },
+      {
+        "id": 2,
+        "uuid": "550e8400-e29b-41d4-a716-446655440002",
+        "username": "janesmith",
+        "email": "jane.smith@example.com",
+        "profile": {
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=janesmith",
+          "bio": "Product designer passionate about UX",
+          "location": "New York, NY"
+        },
+        "role": "user",
+        "status": "active",
+        "createdAt": "2024-02-20T10:15:00Z",
+        "updatedAt": "2024-11-28T09:45:12Z"
+      },
+      {
+        "id": 3,
+        "uuid": "550e8400-e29b-41d4-a716-446655440003",
+        "username": "bobwilson",
+        "email": "bob.wilson@example.com",
+        "profile": {
+          "firstName": "Bob",
+          "lastName": "Wilson",
+          "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bobwilson",
+          "bio": "DevOps engineer and cloud architect",
+          "location": "Seattle, WA"
+        },
+        "role": "moderator",
+        "status": "active",
+        "createdAt": "2024-03-05T14:00:00Z",
+        "updatedAt": "2024-12-01T16:30:45Z"
+      },
+      {
+        "id": 4,
+        "uuid": "550e8400-e29b-41d4-a716-446655440004",
+        "username": "alicejohnson",
+        "email": "alice.johnson@example.com",
+        "profile": {
+          "firstName": "Alice",
+          "lastName": "Johnson",
+          "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=alicejohnson",
+          "bio": "Full-stack developer and open source contributor",
+          "location": "Austin, TX"
+        },
+        "role": "user",
+        "status": "inactive",
+        "createdAt": "2024-04-12T09:20:00Z",
+        "updatedAt": "2024-10-15T11:10:22Z"
+      },
+      {
+        "id": 5,
+        "uuid": "550e8400-e29b-41d4-a716-446655440005",
+        "username": "charlielee",
+        "email": "charlie.lee@example.com",
+        "profile": {
+          "firstName": "Charlie",
+          "lastName": "Lee",
+          "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=charlielee",
+          "bio": "Data scientist specializing in ML",
+          "location": "Boston, MA"
+        },
+        "role": "user",
+        "status": "active",
+        "createdAt": "2024-05-25T11:45:00Z",
+        "updatedAt": "2024-12-05T08:55:18Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "perPage": 10,
+      "total": 5,
+      "totalPages": 1
+    }
+  },
+  "meta": {
+    "requestId": "req_abc123xyz",
+    "timestamp": "2024-12-17T10:30:00Z",
+    "version": "1.0.0"
+  }
+}

@@ -1,0 +1,94 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1
+  docker: circleci/docker@2.4
+
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:20.10
+    working_directory: ~/project
+
+jobs:
+  lint-and-test:
+    executor: node-executor
+    docker:
+      - image: cimg/node:20.10
+      - image: cimg/postgres:15.0
+        environment:
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+      - image: cimg/redis:7.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: pnpm
+      - run:
+          name: Run linter
+          command: pnpm lint
+      - run:
+          name: Run type check
+          command: pnpm typecheck
+      - run:
+          name: Run tests
+          command: pnpm test:coverage
+          environment:
+            DATABASE_URL: postgresql://test@localhost:5432/test
+            REDIS_URL: redis://localhost:6379
+      - store_test_results:
+          path: coverage
+      - store_artifacts:
+          path: coverage
+
+  build:
+    executor: node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: pnpm
+      - run:
+          name: Build application
+          command: pnpm build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  deploy-staging:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy to staging
+          command: echo "Deploying to staging..."
+
+  deploy-production:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy to production
+          command: echo "Deploying to production..."
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - lint-and-test
+      - build:
+          requires:
+            - lint-and-test
+      - deploy-staging:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - deploy-production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main

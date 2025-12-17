@@ -1,0 +1,82 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "20"
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+.node-cache: &node-cache
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - .pnpm-store/
+
+lint:
+  stage: test
+  image: node:${NODE_VERSION}-alpine
+  <<: *node-cache
+  script:
+    - corepack enable pnpm
+    - pnpm install --frozen-lockfile
+    - pnpm lint
+    - pnpm typecheck
+
+test:
+  stage: test
+  image: node:${NODE_VERSION}-alpine
+  <<: *node-cache
+  services:
+    - postgres:15-alpine
+    - redis:7-alpine
+  variables:
+    DATABASE_URL: postgresql://postgres:postgres@postgres:5432/test
+    REDIS_URL: redis://redis:6379
+  script:
+    - corepack enable pnpm
+    - pnpm install --frozen-lockfile
+    - pnpm test:coverage
+  coverage: '/Lines\s*:\s*(\d+\.?\d*)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+  only:
+    - main
+    - develop
+
+deploy-staging:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: staging
+    url: https://staging.example.com
+  script:
+    - echo "Deploying to staging..."
+  only:
+    - develop
+
+deploy-production:
+  stage: deploy
+  image: alpine:latest
+  environment:
+    name: production
+    url: https://example.com
+  script:
+    - echo "Deploying to production..."
+  only:
+    - main
+  when: manual
